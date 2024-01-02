@@ -25,4 +25,21 @@ return {
 
 	-- Formatter
 	"stevearc/conform.nvim",
+
+	-- Winbar
+	"SmiteshP/nvim-navic",
+	"nvim-tree/nvim-web-devicons",
+	"utilyre/barbecue.nvim",
+
+	-- Statusline
+	"nvim-lualine/lualine.nvim",
+
+	-- Theme
+	"Shatur/neovim-ayu",
+
+	-- Dashboard
+	"nvimdev/dashboard-nvim",
+
+	-- Discord RPC
+	"andweeb/presence.nvim"
 }

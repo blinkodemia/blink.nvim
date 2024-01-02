@@ -2,6 +2,7 @@ vim.g.mapleader = " "
 vim.opt.termguicolors = true
 vim.opt.background = "dark"
 vim.cmd("set lazyredraw ttyfast number relativenumber")
+vim.opt.updatetime = 100
 vim.loader.enable()
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -20,12 +21,12 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup("plugins")
 
 -- LSP
--- Mason and nvim-cmp
+-- Mason, navic and nvim-cmp
 require("mason").setup()
 require("mason-lspconfig").setup()
 
 local cmp = require 'cmp'
-
+local navic = require("nvim-navic")
 cmp.setup({
 	snippet = {
 		-- REQUIRED - you must specify a snippet engine
@@ -95,12 +96,28 @@ cmp.setup.cmdline(':', {
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
 require('lspconfig')['lua_ls'].setup {
+	on_attach = function(client, bufnr)
+		navic.attach(client, bufnr)
+	end,
 	capabilities = capabilities
 }
 require('lspconfig')['clangd'].setup {
+	on_attach = function(client, bufnr)
+		navic.attach(client, bufnr)
+	end,
 	capabilities = capabilities
 }
 require('lspconfig')['eslint'].setup {
+	on_attach = function(client, bufnr)
+		navic.attach(client, bufnr)
+	end,
+	capabilities = capabilities
+}
+
+require('lspconfig')['html'].setup {
+	on_attach = function(client, bufnr)
+		navic.attach(client, bufnr)
+	end,
 	capabilities = capabilities
 }
 
@@ -169,7 +186,56 @@ require("conform").setup({
 		python = { "isort", "black" },
 		-- Use a sub-list to run only the first available formatter
 		javascript = { { "prettierd", "prettier" } },
+		html = { { "prettierd", "prettier" } },
+		css = { { "prettierd", "prettier" } },
 		typescript = { { "prettierd", "prettier" } },
 		c = { "clangd" },
 	},
+})
+
+-- Barbecue
+require("barbecue").setup()
+require("barbecue.ui").toggle(true)
+
+-- Lualine
+require("lualine").setup({
+	options = {
+		theme = "ayu_dark"
+	}
+})
+
+-- Ayu Dark
+require('ayu').setup({
+	mirage = false, -- Set to `true` to use `mirage` variant instead of `dark` for dark background.
+	overrides = {}, -- A dictionary of group names, each associated with a dictionary of parameters (`bg`, `fg`, `sp` and `style`) and colors in hex.
+})
+require('ayu').colorscheme()
+
+-- Dashboard
+require('dashboard').setup({
+	event = 'VimEnter'
+})
+
+-- Discord
+require("presence").setup({
+	-- General options
+	auto_update         = true,                -- Update activity based on autocmd events (if `false`, map or manually execute `:lua package.loaded.presence:update()`)
+	neovim_image_text   = "The One True Text Editor", -- Text displayed when hovered over the Neovim image
+	main_image          = "file",              -- Main image display (either "neovim" or "file")
+	log_level           = nil,                 -- Log messages at or above this level (one of the following: "debug", "info", "warn", "error")
+	debounce_timeout    = 10,                  -- Number of seconds to debounce events (or calls to `:lua package.loaded.presence:update(<filename>, true)`)
+	enable_line_number  = false,               -- Displays the current line number instead of the current project
+	blacklist           = {},                  -- A list of strings or Lua patterns that disable Rich Presence if the current file name, path, or workspace matches
+	buttons             = true,                -- Configure Rich Presence button(s), either a boolean to enable/disable, a static table (`{{ label = "<label>", url = "<url>" }, ...}`, or a function(buffer: string, repo_url: string|nil): table)
+	file_assets         = {},                  -- Custom file asset definitions keyed by file names and extensions (see default config at `lua/presence/file_assets.lua` for reference)
+	show_time           = true,                -- Show the timer
+
+	-- Rich Presence text options
+	editing_text        = "Editing %s",  -- Format string rendered when an editable file is loaded in the buffer (either string or function(filename: string): string)
+	file_explorer_text  = "Browsing %s", -- Format string rendered when browsing a file explorer (either string or function(file_explorer_name: string): string)
+	git_commit_text     = "Committing changes", -- Format string rendered when committing changes in git (either string or function(filename: string): string)
+	plugin_manager_text = "Managing plugins", -- Format string rendered when managing plugins (either string or function(plugin_manager_name: string): string)
+	reading_text        = "Reading %s",  -- Format string rendered when a read-only or unmodifiable file is loaded in the buffer (either string or function(filename: string): string)
+	workspace_text      = "Working on %s", -- Format string rendered when in a git repository (either string or function(project_name: string|nil, filename: string): string)
+	line_number_text    = "Line %s out of %s", -- Format string rendered when `enable_line_number` is set to true (either string or function(line_number: number, line_count: number): string)
 })
